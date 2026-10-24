@@ -1,0 +1,7 @@
+source_id,name,url,products,documents,count_method,document_type,checked_on,note
+pingan-life,平安人寿在售 / 停售保险产品,https://life.pingan.com/gongkaixinxipilu/baoxianchanpinmulujitiaokuan.jsp,1342,1841,clausetrail corpus list 逐条遍历目录接口,人身险条款 PDF（含历史版本）,2026-10-22,在售 338 + 停售 1503 个条款版本
+chinalife-life,中国人寿产品基本信息,https://www.e-chinalife.com/xxpl/gsgk/cpjbxx/,1578,1578,clausetrail corpus list 逐条遍历数据接口,人身险条款 PDF,2026-10-22,在售 512 + 停售 1066
+newchinalife,新华保险产品基本信息,https://www.newchinalife.com/node/372,830,1346,clausetrail corpus list 逐页遍历列表页和产品详情页,人身险条款 PDF（含已停用版本）,2026-10-22,产品数按 riskCode 计
+cpic-life,太保寿险经营的保险产品目录及条款,https://life.cpic.com.cn/xrsbx/gkxxpl/jbxx/gsgk/jydbxcpmljtk/,1136,1137,clausetrail corpus list 逐页遍历 8 个目录,人身险条款 PDF,2026-10-22,在办 330 + 停办 807
+iac-property,中国保险行业协会财产险产品信息库,https://www.iachina.cn/art/2017/6/29/art_226_45696.html,14000,,页面声明（约数）,财产险条款,2026-10-19,2009-10-01 前备案的产品；查询入口已迁移到 cxcx.iachina.cn，需注册，脚本不抓取
+insqabench,InsQABench（arXiv:2501.10943）,https://arxiv.org/abs/2501.10943,25000,,论文 §4.2 声明（约数）,中文条款（开放数据只含问答和条款片段）,2026-10-19,很可能与上面几家公司重叠，不与其他行相加

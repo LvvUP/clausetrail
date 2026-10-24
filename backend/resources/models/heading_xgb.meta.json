@@ -1,0 +1,63 @@
+{
+  "trained_on": "2026-10-20",
+  "files": [
+    "chinalife-critical-illness-kangning-yuexiang.pdf",
+    "chinalife-medical-kangyibao-yixiang.pdf",
+    "chinalife-whole-life-hengyu-yisheng.pdf",
+    "pingan-long-term-medical-anyibao-exiang.pdf"
+  ],
+  "n_blocks": 3507,
+  "layout_analysis": true,
+  "label_distribution": {
+    "0": 3108,
+    "1": 135,
+    "2": 240,
+    "3": 24
+  },
+  "labels": "0=正文 1=章 2=节/条 3=款/小标题",
+  "label_source": "规则预标注 + heading_overrides.jsonl 人工修正",
+  "top_features": [
+    [
+      "num_decimal_2",
+      25.122982025146484
+    ],
+    [
+      "num_article_cn",
+      22.564210891723633
+    ],
+    [
+      "layout_title",
+      16.66830825805664
+    ],
+    [
+      "num_decimal_1",
+      15.872614860534668
+    ],
+    [
+      "ends_with_punct",
+      12.234795570373535
+    ],
+    [
+      "length",
+      8.234313011169434
+    ],
+    [
+      "first_on_page",
+      5.659624099731445
+    ],
+    [
+      "num_paren_num",
+      5.495763301849365
+    ],
+    [
+      "ends_with_colon",
+      4.926316261291504
+    ],
+    [
+      "rel_font_size",
+      3.9629976749420166
+    ]
+  ],
+  "runtime": "TreeEnsemble（纯 numpy）",
+  "parity_max_abs_diff": 8.805918949583713e-08
+}

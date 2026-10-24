@@ -1,0 +1,5 @@
+款知 ClauseTrail
+Copyright 2026 The ClauseTrail Authors
+
+backend/third_party/deepdoc contains code derived from InfiniFlow/ragflow
+(https://github.com/infiniflow/ragflow), licensed under the Apache License, Version 2.0.

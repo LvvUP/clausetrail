@@ -1,0 +1,56 @@
+/* 设计 token：「纸质条款 + 批注」。暖白纸色底、墨色正文；印章红只用于引用编号和主操作，海松绿表示有出处，琥珀色表示拒答 */
+:root,
+[data-theme='light'] {
+  --bg: #f7f5f0;
+  --surface: #ffffff;
+  --ink: #1f2328;
+  --ink-muted: #5b616b;
+  --rule: #e3dfd6;
+  --seal: #b4232c;
+  --seal-ink: #ffffff;
+  --evidence: #2f6b5a;
+  --caution: #a86a12;
+  --danger: #b42318;
+  --highlight: #fbefc5;
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  --bg: #15171a;
+  --surface: #1d2024;
+  --ink: #e8e6e1;
+  --ink-muted: #a3a8b0;
+  --rule: #2c3036;
+  --seal: #e26a70;
+  --seal-ink: #15171a;
+  --evidence: #6fb8a2;
+  --caution: #e0a84a;
+  --danger: #f07a6e;
+  --highlight: #4a3f1a;
+  color-scheme: dark;
+}
+
+/* 脚本未执行时按系统设置走 */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --bg: #15171a;
+    --surface: #1d2024;
+    --ink: #e8e6e1;
+    --ink-muted: #a3a8b0;
+    --rule: #2c3036;
+    --seal: #e26a70;
+    --seal-ink: #15171a;
+    --evidence: #6fb8a2;
+    --caution: #e0a84a;
+    --danger: #f07a6e;
+    --highlight: #4a3f1a;
+    color-scheme: dark;
+  }
+}
+
+:root {
+  --font-body: 'Noto Sans SC', system-ui, -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-clause: 'Noto Serif SC', 'Songti SC', 'SimSun', serif;
+  --font-num: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --shadow-hairline: 0 1px 2px rgb(0 0 0 / 0.06);
+}

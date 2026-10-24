@@ -1,0 +1,35 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+.ruff_cache/
+.pytest_cache/
+node_modules/
+dist/
+*.log
+*.tsbuildinfo
+.vscode/
+.idea/
+
+# 内部文档
+docs/internal/
+
+# PDF 只提交 data/samples 里的样例
+*.pdf
+*.PDF
+!data/samples/**/*.pdf
+
+# 本地索引与会话库（make ingest 生成）
+data/milvus.db*
+data/.milvus.db*
+data/*.sqlite3*
+
+# clausetrail corpus 生成的条款清单和下载的 PDF，不进仓库
+data/corpus/
+
+# 评测报告由 make eval 在本地生成，不进仓库
+eval/reports/

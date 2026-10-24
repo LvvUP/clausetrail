@@ -1,0 +1,60 @@
+{
+  "generated_on": "2026-10-21",
+  "mode": "template",
+  "seed": 20261019,
+  "counts": {
+    "dev": 100,
+    "retrieval_test": 317,
+    "rewrite_test": 200,
+    "citation_sample": 200
+  },
+  "by_type": {
+    "dev": {
+      "general": 40,
+      "term": 40,
+      "unanswerable": 20
+    },
+    "retrieval_test": {
+      "general": 154,
+      "term": 163
+    }
+  },
+  "by_subtype": {
+    "dev": {
+      "section": 23,
+      "detail": 17,
+      "definition": 40,
+      "off_topic": 20
+    },
+    "retrieval_test": {
+      "section": 79,
+      "detail": 66,
+      "exclusion": 9,
+      "definition": 163
+    }
+  },
+  "documents": [
+    {
+      "file": "chinalife-critical-illness-kangning-yuexiang.pdf",
+      "doc_id": "bfc499bf308089bb",
+      "split": "test"
+    },
+    {
+      "file": "chinalife-medical-kangyibao-yixiang.pdf",
+      "doc_id": "2390869068f68280",
+      "split": "test"
+    },
+    {
+      "file": "chinalife-whole-life-hengyu-yisheng.pdf",
+      "doc_id": "f028f35148ae2ec1",
+      "split": "test"
+    },
+    {
+      "file": "pingan-long-term-medical-anyibao-exiang.pdf",
+      "doc_id": "554884992560f5f8",
+      "split": "dev"
+    }
+  ],
+  "parsing_sample_plan_rows": 100,
+  "note": "每道题对应一句不同的 gold 原文（同一句原文不重复出题），gold 都能在原文中逐字找到；问题由模板生成，未经人工校验（verified=auto）"
+}

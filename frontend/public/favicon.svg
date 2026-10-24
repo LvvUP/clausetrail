@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>
+    .page { fill: #f7f5f0; stroke: #1f2328 }
+    .ink { stroke: #1f2328 }
+    .seal { stroke: #b4232c }
+    .dot { fill: #b4232c }
+    @media (prefers-color-scheme: dark) {
+      .page { fill: #1d2024; stroke: #e8e6e1 }
+      .ink { stroke: #e8e6e1 }
+      .seal { stroke: #e26a70 }
+      .dot { fill: #e26a70 }
+    }
+  </style>
+  <path class="page" d="M7 3.5h12.5L25 9v19.5H7z" stroke-width="2" stroke-linejoin="round" />
+  <path class="ink" d="M19.5 3.5V9H25" fill="none" stroke-width="2" stroke-linejoin="round" />
+  <path class="ink" d="M11 13h7M11 17.5h4.5" stroke-width="2" stroke-linecap="round" />
+  <path class="seal" d="M11 22h6.5a4 4 0 0 0 4-4v-1.5" fill="none" stroke-width="2" stroke-linecap="round" />
+  <circle class="dot" cx="21.5" cy="14" r="2" />
+</svg>

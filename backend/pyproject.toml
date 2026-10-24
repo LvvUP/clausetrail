@@ -1,0 +1,65 @@
+[project]
+name = "clausetrail"
+version = "0.1.0"
+description = "Insurance clause question answering with traceable citations"
+license = "Apache-2.0"
+requires-python = ">=3.12,<3.14"
+dependencies = [
+    "fastapi==0.146.0",
+    "uvicorn==0.54.0",
+    "sse-starlette==3.5.0",
+    "pydantic==2.14.1",
+    "pydantic-settings==2.16.0",
+    "httpx==0.28.1",
+    "openai==3.35.1",
+    "pymilvus==3.0.2",
+    "milvus-lite==3.2.2",
+    "jieba==0.42.1",
+    "redis==8.1.0",
+    "xgboost==3.4.1",
+    "numpy==2.5.4",
+    "pdfplumber==0.11.10",
+    "pypdfium2==5.14.0",
+    "pillow==13.0.0",
+    "opencv-python-headless==5.0.0.93",
+    "onnxruntime==1.31.0",
+    "shapely==2.2.0",
+    "pyclipper==1.4.0",
+    "huggingface_hub==2.2.0",
+    "opencc-python-reimplemented==0.1.7",
+]
+
+[project.optional-dependencies]
+es = ["elasticsearch==9.5.1"]
+local-models = ["FlagEmbedding==1.4.2", "torch==2.14.1"]
+mineru = ["mineru==4.0.12"]
+ocr = ["paddleocr==3.7.0", "paddlepaddle==3.3.1"]
+dev = ["pytest==9.1.1", "ruff==0.17.1"]
+
+[project.scripts]
+clausetrail = "clausetrail.cli:main"
+
+[build-system]
+requires = ["hatchling==1.32.4"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/clausetrail", "third_party/deepdoc"]
+
+[tool.hatch.build.targets.wheel.sources]
+"src" = ""
+"third_party" = ""
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "third_party", "."]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+extend-exclude = ["third_party"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "RUF"]
+ignore = ["RUF001", "RUF002", "RUF003"]

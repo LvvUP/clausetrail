@@ -91,7 +91,7 @@ def render(res: dict) -> str:
         lines += [
             "**读数说明（离线示例模型）**：示例模型的改写只是把上一问和追问拼接，所以这里的改写准确率实际只反映「该不该改写」判得对不对。"
             "「承接」类追问既没有指代词也没有省略句式，只能靠与上一问的向量相似度判断；"
-            "示例向量模型下相似度都低于 CONTINUITY_SIMILARITY_THRESHOLD，所以这一类几乎全部判成了话题切换。",
+            "示例向量模型下相似度大多低于 CONTINUITY_SIMILARITY_THRESHOLD，所以这一类几乎全部判成了话题切换。",
             "",
         ]
     if res["failures"]:

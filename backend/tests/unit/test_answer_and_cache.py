@@ -78,6 +78,9 @@ def test_continuity_rules():
     assert (d.topic, d.rewrite) == ("continue", True)
     d = asyncio.run(run("意外伤害保险的理赔需要哪些资料", "这款重疾险的等待期多久", threshold=0.95))
     assert (d.topic, d.rewrite) == ("switch", False)
+    # 没有指代词、也不短的追问，相似度过了阈值同样要改写（补上产品名）
+    d = asyncio.run(run("质子重离子有哪些例外情况？", "请问康医保易享的质子重离子是什么？", threshold=-1.0))
+    assert (d.topic, d.rewrite, d.reason) == ("continue", True, "similar")
 
 
 def test_rewrite_output_cleanup():

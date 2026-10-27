@@ -82,6 +82,24 @@ def test_table_region_with_clause_numbers_is_body():
     assert any(b.kind == BlockKind.TEXT and b.text.startswith("1.1 保险计划") for b in content.blocks)
 
 
+def test_formula_superscripts_are_kept_in_body_text():
+    # 正文路径和表格路径用同一套判断：10⁹/L 的 9 跟在数字后面，是公式的一部分
+    with pdfplumber.open(SAMPLES / "chinalife-critical-illness-kangning-yuexiang.pdf") as pdf:
+        texts = [ln["text"] for ln in page_lines(pdf.pages[7])]
+    assert any("中性粒细胞绝对值<0.5×109/L" in t for t in texts)
+
+
+def test_footnote_after_a_code_is_still_dropped():
+    # 「ICD-10²⁴」的 24 跟在数字后面，但它是本页脚注区里的编号，仍然是脚注角标
+    with pdfplumber.open(SAMPLES / "pingan-long-term-medical-anyibao-exiang.pdf") as pdf:
+        page = pdf.pages[9]
+        texts = [ln["text"] for ln in page_lines(page)]
+        table_text = "".join(c["text"] for c in drop_superscripts(page).chars)
+    assert any("（ICD-10）确定" in t for t in texts)
+    assert not any("ICD-1024" in t for t in texts)
+    assert "ICD-1024" not in table_text
+
+
 def test_footnote_superscripts_are_dropped():
     with pdfplumber.open(SAMPLES / "pingan-long-term-medical-anyibao-exiang.pdf") as pdf:
         page = pdf.pages[16]

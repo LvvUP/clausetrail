@@ -183,6 +183,7 @@ def _continues_head(head: dict, segment: list[dict], text: str) -> bool:
 # 这里按栏间距拆开，把「编号+标题」单独成行，标题折到下一行的几个字再接回去
 def page_lines(page: pdfplumber.page.Page) -> list[dict]:
     floor = superscript_floor(page)
+    notes = footnote_numbers(page, floor) if floor else frozenset()
     lines: list[dict] = []
     head: list[dict] | None = None
     head_at = -1
@@ -190,7 +191,10 @@ def page_lines(page: pdfplumber.page.Page) -> list[dict]:
         kept = [c for c in ln["chars"] if _keep_char(c)]
         # 整行都是小字（小字号表格、脚注）时没有角标可言，行里的数字和 % 要保留
         has_body = any(c["size"] >= floor for c in kept if c["text"].strip())
-        chars = [{**c, "ghost": True} if has_body and is_superscript(c, floor) else c for c in kept]
+        # 和表格路径（drop_superscripts）用同一套判断：只去掉跟在汉字、中文标点后面的脚注角标，
+        # 公式里的上下标（10⁹/L、T₁N₀M₀）跟在数字、字母后面，照常保留
+        marks = _footnote_marks(kept, floor, notes) if has_body else set()
+        chars = [{**c, "ghost": True} if id(c) in marks else c for c in kept]
         segments = _segments(chars)
         if not segments:
             continue
@@ -306,23 +310,59 @@ def _left_neighbor(c: dict, chars: list[dict], gap: float) -> dict | None:
     return best
 
 
-def _footnote_marks(chars: list[dict], floor: float) -> set[int]:
-    """和正文同一行的小字里真正的脚注角标（返回 id）。连着的一串小字（如 1/360）按这串前面的正文字判断。"""
+FOOTNOTE_LINE = re.compile(r"^(\d{1,3})\s*[^\d\s.．、]")
+
+
+def footnote_numbers(page: pdfplumber.page.Page, floor: float) -> frozenset[str]:
+    """本页脚注区里的编号：行首是小字号编号、后面的注释文字不是小字的行，如「²⁴ ICD-10指……」。
+    病种表里「1 恶性肿瘤」这类行的编号是正文字号；小字号表格整行都是小字，这两种都不算。"""
+    numbers = set()
+    for ln in page.extract_text_lines(return_chars=True, strip=True):
+        m = FOOTNOTE_LINE.match(ln["text"])
+        if not m:
+            continue
+        visible = [c for c in ln["chars"] if c["text"].strip()]
+        lead, rest = visible[: len(m.group(1))], visible[len(m.group(1)) :]
+        if rest and all(c["size"] < floor for c in lead) and statistics.median(c["size"] for c in rest) >= floor:
+            numbers.add(m.group(1))
+    return frozenset(numbers)
+
+
+def _footnote_marks(chars: list[dict], floor: float, notes: frozenset[str] = frozenset()) -> set[int]:
+    """和正文同一行的小字里真正的脚注角标（返回 id）。连着的一串小字（如 1/360）作为一个整体判断：
+    - 跟在汉字、中文标点后面的是脚注角标；
+    - 跟在字母、数字、右括号后面的一般是公式里的上下标（10⁹/L、T₁N₀M₀），保留；
+    - 例外：编号本身就是本页脚注区里的编号时（「ICD-10²⁴」的 24），仍然是脚注角标。"""
     bands = _body_bands(chars, floor)
     tops = [b[0] for b in bands]
     small = [c for c in chars if is_superscript(c, floor) and _overlaps_body(c, bands, tops)]
     small_ids = {id(c) for c in small}
+    left = {id(c): _left_neighbor(c, chars, floor) for c in small}
     anchors: dict[int, str] = {}
 
     def anchor(c: dict) -> str:
         key = id(c)
         if key not in anchors:
             anchors[key] = ""  # 先占位，防止互相引用时无限递归
-            n = _left_neighbor(c, chars, floor)
+            n = left[key] if key in left else _left_neighbor(c, chars, floor)
             anchors[key] = "" if n is None else anchor(n) if id(n) in small_ids else n["text"]
         return anchors[key]
 
-    return {id(c) for c in small if not FORMULA_ANCHOR.fullmatch(anchor(c))}
+    # 按「往左一直连到第一个小字」把连着的小字分成一串一串
+    runs: dict[int, list[dict]] = {}
+    for c in small:
+        head, seen = c, {id(c)}
+        while (n := left[id(head)]) is not None and id(n) in small_ids and id(n) not in seen:
+            head = n
+            seen.add(id(n))
+        runs.setdefault(id(head), []).append(c)
+
+    marks = set()
+    for run in runs.values():
+        text = "".join(c["text"] for c in sorted(run, key=lambda c: c["x0"])).strip()
+        if not FORMULA_ANCHOR.fullmatch(anchor(run[0])) or (text.isdigit() and text in notes):
+            marks.update(id(c) for c in run)
+    return marks
 
 
 # 只删和正文字在同一行的小字：小字号表格、脚注里整行都是小字，里面的数字和 % 是要保留的内容；
@@ -331,7 +371,7 @@ def drop_superscripts(page: pdfplumber.page.Page) -> pdfplumber.page.Page:
     floor = superscript_floor(page)
     if not floor:
         return page
-    marks = _footnote_marks(page.chars, floor)
+    marks = _footnote_marks(page.chars, floor, footnote_numbers(page, floor))
     if not marks:
         return page
     return page.filter(lambda obj: obj.get("object_type") != "char" or id(obj) not in marks)

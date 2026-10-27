@@ -10,7 +10,7 @@ from clausetrail.breaker import Breaker
 from clausetrail.cache.query_cache import RedisCache, normalize_query
 from clausetrail.chunking.text_utils import count_tokens
 from clausetrail.index.bm25 import ES_LEXICON_KEY, sync_es
-from clausetrail.ingest.native_pdf import _is_bold, drop_superscripts
+from clausetrail.ingest.native_pdf import SUPERSCRIPT_RATIO, _footnote_marks, _is_bold, drop_superscripts
 from clausetrail.models.reranker import TRUNCATION_MARGIN, truncate_for_pair
 from clausetrail.storage.db import Database
 from clausetrail.structure.ocr_correction import correct_text, load_confusions, load_terms
@@ -117,13 +117,16 @@ def test_short_term_correction_skips_real_words():
 
 
 class _FakePage:
-    """只提供 drop_superscripts 用到的 chars 和 filter。"""
+    """只提供 drop_superscripts 用到的 chars、filter 和 extract_text_lines（假页面上没有脚注注释行）。"""
 
     def __init__(self, chars: list[dict]):
         self.chars = chars
 
     def filter(self, keep):
         return _FakePage([c for c in self.chars if keep(c)])
+
+    def extract_text_lines(self, **kwargs):
+        return []
 
 
 def _char(text: str, size: float, top: float, x: float = 0.0) -> dict:
@@ -164,3 +167,15 @@ def test_formula_subscripts_are_kept_but_footnote_marks_dropped():
     # 连着的一串上标按这串前面的字判断：「（1＋年利率）」后面的 1/360 整串保留
     parts = [(t, 10, 100) for t in "日利率＝（1＋年利率）"] + [(t, 5, 99) for t in "1/360"] + [("－", 10, 100)]
     assert "".join(c["text"] for c in drop_superscripts(_FakePage(_line(parts))).chars).endswith("）1/360－")
+
+
+def test_footnote_number_after_a_code_is_dropped():
+    # 「ICD-10²⁴」：24 跟在数字后面，但本页脚注区有「24 ……」这条注释，所以它是脚注角标
+    parts = [(t, 10, 100) for t in "ICD-10"] + [("2", 5, 99), ("4", 5, 99)] + [(t, 10, 100) for t in "确定"]
+    chars = _line(parts)
+    floor = 10 * SUPERSCRIPT_RATIO
+    kept = [c for c in chars if id(c) not in _footnote_marks(chars, floor, frozenset({"24"}))]
+    assert "".join(c["text"] for c in kept) == "ICD-10确定"
+    # 不在脚注名单里的编号仍按公式保留
+    kept = [c for c in chars if id(c) not in _footnote_marks(chars, floor, frozenset({"9"}))]
+    assert "".join(c["text"] for c in kept) == "ICD-1024确定"

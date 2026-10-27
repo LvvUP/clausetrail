@@ -8,7 +8,6 @@ PRONOUN = re.compile(
 )
 ELLIPSIS = re.compile(r"^(那|那么|还有|另外|如果是|要是|换成|改成|再问)|呢[？?]?$")
 FRAGMENT_CHARS = 5
-SHORT_QUESTION_CHARS = 10
 
 NEW, CONTINUE, SWITCH = "new", "continue", "switch"
 
@@ -36,7 +35,7 @@ async def judge(question: str, last_standalone: str | None, embedder: Embedder, 
     # embedder 输出的是单位向量，点积就是余弦相似度
     sim = float(vecs[0] @ vecs[1])
     if sim >= threshold:
-        # 话题相近但问句已经够长的，多半本身就完整，只对短问句做改写
-        short = len(q) <= SHORT_QUESTION_CHARS
-        return Decision(CONTINUE, short, "similar_short" if short else "similar", round(sim, 4))
+        # 话题相近就交给轻量模型改写：「质子重离子有哪些例外情况」这类追问不短，也没有指代词，但缺了产品名。
+        # 问句本身已经完整时，改写提示词要求原样返回，不会被改坏
+        return Decision(CONTINUE, True, "similar", round(sim, 4))
     return Decision(SWITCH, False, "dissimilar", round(sim, 4))

@@ -40,4 +40,4 @@ DeepDoc 的版面、OCR、表格结构模型来自 HuggingFace [`InfiniFlow/deep
 
 ## 术语词典
 
-`backend/resources/terms/` 下的保险术语（571 条）、同义词（55 组）和 OCR 混淆字表由 `backend/scripts/build_terms.py` 生成：一部分是人工整理，一部分从样例条款的病种表里抽取。
+`backend/resources/terms/` 下的保险术语（571 条）、同义词（33 组，共 54 个别名）和 OCR 混淆字表由 `backend/scripts/build_terms.py` 生成：一部分是人工整理，一部分从样例条款的病种表里抽取。

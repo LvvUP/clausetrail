@@ -7,6 +7,7 @@ import httpx
 
 from clausetrail.chunking.text_utils import count_tokens, tokenize_for_search
 from clausetrail.config import Settings, get_settings
+from clausetrail.models import want_fp16
 
 log = logging.getLogger(__name__)
 
@@ -76,8 +77,9 @@ class LocalBgeReranker:
         from FlagEmbedding import FlagReranker
 
         path = settings.local_model_dir / "bge-reranker-large"
-        self.name = f"local:{path}"
-        self._model = FlagReranker(str(path), use_fp16=False)
+        fp16 = want_fp16(settings.local_model_fp16)
+        self.name = f"local:{path}" + (" (fp16)" if fp16 else "")
+        self._model = FlagReranker(str(path), use_fp16=fp16)
         self._max_tokens = settings.reranker_max_tokens
 
     async def score(self, query: str, docs: list[str]) -> list[float]:

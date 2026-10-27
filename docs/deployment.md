@@ -40,6 +40,10 @@ LLM_BACKEND=fake
 
 缺少哪一组，`/api/health` 和 `clausetrail health` 就把对应组件标成不可用，提问时返回 `model_unavailable`。
 
+### 本地模型
+
+`EMBEDDER_BACKEND=local`、`RERANKER_BACKEND=local` 时，用 FlagEmbedding 加载 `LOCAL_MODEL_DIR` 下的 bge-m3 和 bge-reranker-large（`make models LOCAL=1` 下载，约 3.3 GB，需要先安装 `backend[local-models]`）。`LOCAL_MODEL_FP16` 控制是否用 FP16：默认 `auto`，检测到 CUDA GPU 时开启；也可以写 `true` / `false` 强制指定。CPU 上 FP16 反而更慢。实际是否开启，在 `/api/health` 的组件名后面会标出 `(fp16)`。
+
 ## 依赖服务（compose.yaml）
 
 ```bash

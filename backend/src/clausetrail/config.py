@@ -48,6 +48,8 @@ class Settings(BaseSettings):
     llm_answer_model: str = "qwen-plus"
 
     local_model_dir: Path = Path.home() / ".cache" / "clausetrail" / "models"
+    # 本地 bge 模型是否用 FP16。auto：检测到 CUDA GPU 时开启；CPU 上 FP16 反而更慢，部分算子也不支持
+    local_model_fp16: Literal["auto"] | bool = "auto"
 
     # 不叫 MILVUS_URI：pymilvus 导入时会从环境变量和 .env 读取同名变量，且只接受 http(s) 地址
     vector_store_uri: str = str(PROJECT_ROOT / "data" / "milvus.db")

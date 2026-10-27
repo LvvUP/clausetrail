@@ -113,7 +113,7 @@ backend/.venv/bin/clausetrail health                                # 各组件�
 
 | 类别 | 变量 |
 | --- | --- |
-| 模型后端 | `EMBEDDER_BACKEND`、`RERANKER_BACKEND`、`LLM_BACKEND`（`aliyun_*` / `local` / `fake`） |
+| 模型后端 | `EMBEDDER_BACKEND`、`RERANKER_BACKEND`、`LLM_BACKEND`（`aliyun_*` / `local` / `fake`）；本地模型用 `LOCAL_MODEL_DIR`、`LOCAL_MODEL_FP16` |
 | 阿里云 | `ALIYUN_PAI_EAS_*`、`ALIYUN_OPENSEARCH_*`、`ALIYUN_BAILIAN_*`、`LLM_REWRITE_MODEL`、`LLM_ANSWER_MODEL` |
 | 检索 | `VECTOR_STORE_URI`、`BM25_BACKEND`、`ES_URL`、`RECALL_TOP_K`、`RRF_K`、`RERANK_TOP_K`、`CONTEXT_TOP_K` |
 | 拒答与缓存 | `REFUSAL_THRESHOLD`（在开发集上标定）、`REDIS_URL` |

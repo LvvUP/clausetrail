@@ -119,3 +119,36 @@ def test_missing_keys_fail_fast(tmp_path):
     for cls in (AliyunOpenSearchReranker, AliyunPaiEasEmbedder, BailianLLM):
         with pytest.raises(ValueError, match="未配置"):
             cls(bare)
+
+
+def test_local_models_use_fp16_only_when_configured_or_on_gpu(monkeypatch):
+    import sys
+    from types import SimpleNamespace
+
+    from clausetrail.config import Settings
+    from clausetrail.models import want_fp16
+    from clausetrail.models.reranker import LocalBgeReranker
+
+    # 环境变量里的 true / false 解析成布尔值，auto 保留原样
+    assert Settings(_env_file=None, local_model_fp16="true").local_model_fp16 is True
+    assert Settings(_env_file=None, local_model_fp16="false").local_model_fp16 is False
+    assert Settings(_env_file=None).local_model_fp16 == "auto"
+
+    # auto：有 CUDA GPU 才开；没装 torch 时按关闭处理
+    monkeypatch.setitem(sys.modules, "torch", SimpleNamespace(cuda=SimpleNamespace(is_available=lambda: True)))
+    assert want_fp16("auto") is True and want_fp16(False) is False
+    monkeypatch.setitem(sys.modules, "torch", SimpleNamespace(cuda=SimpleNamespace(is_available=lambda: False)))
+    assert want_fp16("auto") is False and want_fp16(True) is True
+    monkeypatch.setitem(sys.modules, "torch", None)
+    assert want_fp16("auto") is False
+
+    # 本地精排把这个开关原样传给 FlagReranker
+    seen = {}
+
+    class FakeFlagReranker:
+        def __init__(self, path, use_fp16):
+            seen["use_fp16"] = use_fp16
+
+    monkeypatch.setitem(sys.modules, "FlagEmbedding", SimpleNamespace(FlagReranker=FakeFlagReranker))
+    reranker = LocalBgeReranker(Settings(_env_file=None, local_model_fp16=True))
+    assert seen["use_fp16"] is True and reranker.name.endswith("(fp16)")

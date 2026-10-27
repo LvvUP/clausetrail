@@ -87,7 +87,7 @@ Everything is set in `.env`; see [.env.example](.env.example) for the full list.
 
 | Group | Variables |
 | --- | --- |
-| Model backends | `EMBEDDER_BACKEND`, `RERANKER_BACKEND`, `LLM_BACKEND` (`aliyun_*` / `local` / `fake`) |
+| Model backends | `EMBEDDER_BACKEND`, `RERANKER_BACKEND`, `LLM_BACKEND` (`aliyun_*` / `local` / `fake`); local models use `LOCAL_MODEL_DIR` and `LOCAL_MODEL_FP16` |
 | Alibaba Cloud | `ALIYUN_PAI_EAS_*`, `ALIYUN_OPENSEARCH_*`, `ALIYUN_BAILIAN_*`, `LLM_REWRITE_MODEL`, `LLM_ANSWER_MODEL` |
 | Retrieval | `VECTOR_STORE_URI`, `BM25_BACKEND`, `ES_URL`, `RECALL_TOP_K`, `RRF_K`, `RERANK_TOP_K`, `CONTEXT_TOP_K` |
 | Refusal & cache | `REFUSAL_THRESHOLD` (calibrated on the dev set), `REDIS_URL` |

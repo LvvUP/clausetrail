@@ -9,6 +9,7 @@ import numpy as np
 
 from clausetrail.chunking.text_utils import tokenize_for_search
 from clausetrail.config import Settings, get_settings
+from clausetrail.models import want_fp16
 
 log = logging.getLogger(__name__)
 
@@ -87,9 +88,10 @@ class LocalBgeM3Embedder:
         from FlagEmbedding import BGEM3FlagModel
 
         path = settings.local_model_dir / "bge-m3"
-        self.name = f"local:{path}"
+        fp16 = want_fp16(settings.local_model_fp16)
+        self.name = f"local:{path}" + (" (fp16)" if fp16 else "")
         self.dim = 1024
-        self._model = BGEM3FlagModel(str(path), use_fp16=False)
+        self._model = BGEM3FlagModel(str(path), use_fp16=fp16)
 
     async def embed(self, texts: list[str]) -> np.ndarray:
         if not texts:

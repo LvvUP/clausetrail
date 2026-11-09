@@ -1,5 +1,8 @@
 import logging
 
+# 放在模块顶层：没装 elasticsearch 时，导入本模块就会抛 ImportError，build_bm25 据此降级为 Milvus BM25
+from elasticsearch import Elasticsearch
+
 from clausetrail import lexicon
 from clausetrail.config import Settings
 from clausetrail.types import Chunk
@@ -11,8 +14,6 @@ class ElasticsearchBM25:
     name = "elasticsearch"
 
     def __init__(self, settings: Settings):
-        from elasticsearch import Elasticsearch
-
         auth = (settings.es_username, settings.es_password) if settings.es_username else None
         self._es = Elasticsearch(settings.es_url, basic_auth=auth, request_timeout=10)
         self._index = settings.es_index

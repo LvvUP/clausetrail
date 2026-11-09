@@ -1,4 +1,5 @@
 import asyncio
+import sys
 import time
 
 import pytest
@@ -9,11 +10,12 @@ from clausetrail.answer.citations import CitationFilter, normalize_markers
 from clausetrail.breaker import Breaker
 from clausetrail.cache.query_cache import RedisCache, normalize_query
 from clausetrail.chunking.text_utils import count_tokens
-from clausetrail.index.bm25 import ES_LEXICON_KEY, sync_es
+from clausetrail.index.bm25 import ES_LEXICON_KEY, MilvusBM25, build_bm25, sync_es
 from clausetrail.ingest.native_pdf import SUPERSCRIPT_RATIO, _footnote_marks, _is_bold, drop_superscripts
 from clausetrail.models.reranker import TRUNCATION_MARGIN, truncate_for_pair
 from clausetrail.storage.db import Database
 from clausetrail.structure.ocr_correction import correct_text, load_confusions, load_terms
+from tests.conftest import make_settings
 
 
 def test_number_ranges_do_not_collide_in_cache_key():
@@ -179,3 +181,12 @@ def test_footnote_number_after_a_code_is_dropped():
     # 不在脚注名单里的编号仍按公式保留
     kept = [c for c in chars if id(c) not in _footnote_marks(chars, floor, frozenset({"9"}))]
     assert "".join(c["text"] for c in kept) == "ICD-1024确定"
+
+
+def test_bm25_falls_back_when_es_client_missing(monkeypatch, tmp_path):
+    # 默认 BM25_BACKEND=es，但 make setup 不装 elasticsearch：应降级为 Milvus BM25，而不是启动就崩
+    monkeypatch.setitem(sys.modules, "elasticsearch", None)
+    monkeypatch.delitem(sys.modules, "clausetrail.index.es_store", raising=False)
+    bm25, reason = build_bm25(make_settings(tmp_path, bm25_backend="es"), store=None)
+    assert isinstance(bm25, MilvusBM25)
+    assert "未安装" in reason
